@@ -26,8 +26,8 @@ exports.addUser = async (req, res) => {
     "https://res.cloudinary.com/dbcax4vbb/image/upload/v1578342211/computer-icons-user-profile-avatar-profile_saieve.jpg";
   password = hash;
   try {
-    const user = await User.createUser({ name, email, password, avatar })[0];
-    return res.status(200).json({ user, token });
+    const user = await User.createUser({ name, email, password, avatar });
+    return res.status(200).json({ user: user[0], token });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Something Wrong with the database" });
