@@ -18,3 +18,10 @@ exports.createUser = body => {
     ])
     .insert(body);
 };
+
+exports.getUserByEmail = email => {
+  return db("users")
+  .select(["name" ,"email" ,"avatar","password"])
+  .where({email})
+  .first()
+}
