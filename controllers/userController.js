@@ -26,7 +26,7 @@ exports.addUser = async (req, res) => {
     "https://res.cloudinary.com/dbcax4vbb/image/upload/v1578342211/computer-icons-user-profile-avatar-profile_saieve.jpg";
   password = hash;
   try {
-    const user = await User.createUser({ name, email, password, avatar });
+    const user = await User.createUser({ name, email, password, avatar })[0];
     return res.status(200).json({ user, token });
   } catch (error) {
     console.log(error);
@@ -51,7 +51,7 @@ exports.signIn = async (req, res) => {
       return res.status(401).json({ error: "Wrong email or password" });
     }
     delete user.password;
-    const token = generateAToken({ name:user.name, email });
+    const token = generateAToken({ name: user.name, email });
     return res.status(200).json({ user, token });
   } catch (error) {
     console.log(error);
