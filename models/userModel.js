@@ -11,7 +11,8 @@ exports.getUserById = id => {
 exports.createUser = body => {
   return db("users")
     .returning(["id", "name", "email", "avatar"])
-    .insert(body);
+    .insert(body)
+    .first();
 };
 
 exports.getUserByEmail = email => {
