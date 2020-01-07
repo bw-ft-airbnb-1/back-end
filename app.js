@@ -15,4 +15,4 @@ app.all("*", (req, res, next) => {
   res.status(404).json({ error: `Can't find ${req.originalUrl}` });
 });
 
-module.exports = app;
+module.exports = app
