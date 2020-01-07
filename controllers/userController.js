@@ -51,7 +51,7 @@ exports.addUser = async (req, res) => {
     console.log(user.id);
     const token = generateAToken({ id: user.id });
     console.log(token);
-    return res.status(200).json({ user, token });
+    return res.status(200).json({ user: user[0], token });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Something Wrong with the database" });
@@ -103,12 +103,16 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-exports.deleteUser = async (req,res) => {
+exports.deleteUser = async (req, res) => {
   try {
     const id = req.userID;
     await User.delete(id);
-    res.status(200).json({message: "User Deleted, Please Remove Token and redirect to homepage"})
+    res
+      .status(200)
+      .json({
+        message: "User Deleted, Please Remove Token and redirect to homepage"
+      });
   } catch (error) {
-    res.status(500).json({error: "Server malfunctioning"})
+    res.status(500).json({ error: "Server malfunctioning" });
   }
-}
+};
