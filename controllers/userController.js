@@ -76,6 +76,7 @@ exports.getToken = (req, res, next) => {
       return next(new AppError("Invalid Token", 403));
     }
     req.userID = decoded.data.id;
+    req.user = decoded.data;
     next();
   });
 };
@@ -121,3 +122,7 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.getAllUsers();
   return res.status(200).json(users);
 });
+
+exports.getOneUser = (req, res) => {
+  res.status(200).json(req.user);
+};
