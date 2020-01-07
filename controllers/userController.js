@@ -45,7 +45,7 @@ exports.addUser = async (req, res) => {
   try {
     let user = await User.createUser({ name, email, password, avatar });
     console.log(user);
-    user = await User.getUserById(user.id);
+    user = await User.getUserById(user[0].id);
     console.log(user);
     delete user.password;
     console.log(user.id);
