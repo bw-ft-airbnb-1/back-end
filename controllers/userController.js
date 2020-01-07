@@ -96,7 +96,7 @@ exports.updateUser = async (req, res) => {
     name = nameArr[0];
     const user = await User.update(id, { name, email });
     console.log(user);
-    res.status(200).json(user);
+    res.status(200).json(user[0]);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Something wrong with the server" });
@@ -110,6 +110,19 @@ exports.deleteUser = async (req, res) => {
     res.status(200).json({
       message: "User Deleted, Please Remove Token and redirect to homepage"
     });
+  } catch (error) {
+    res.status(500).json({ error: "Server malfunctioning" });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  const { role } = req.body;
+  if (!role) {
+    return res.status(403).json({ error: "You shall not pass" });
+  }
+  try {
+    const users = await User.getAllUsers();
+    return res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: "Server malfunctioning" });
   }

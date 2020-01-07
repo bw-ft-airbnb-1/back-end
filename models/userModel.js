@@ -23,11 +23,15 @@ exports.getUserByEmail = email => {
 exports.update = (id, body) => {
   return db("users")
     .where({ id })
-    .update(body, ["id", "name", "email", "avatar", "password"]);
+    .update(body, ["id", "name", "email", "avatar"]);
 };
 
-exports.delete = (id) => {
+exports.delete = id => {
   return db("users")
-    .where({id})
-    .del()
-}
+    .where({ id })
+    .del();
+};
+
+exports.getAllUsers = () => {
+  return db("users").select("id", "name", "email", "avatar");
+};

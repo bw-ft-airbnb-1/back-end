@@ -9,6 +9,7 @@ router.post("/signin", userController.signIn);
 router
   .route("/user")
   .put(userController.getToken, userController.updateUser)
-  .delete(userController.getToken, userController.deleteUser);
+  .delete(userController.getToken, userController.deleteUser)
+  .get(userController.getAllUsers);
 
 module.exports = router;
