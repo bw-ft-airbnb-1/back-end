@@ -1,10 +1,9 @@
 const db = require("../data/dbConfig.js");
-
-const users = "users";
+const AppError = require("../utils/appError");
 
 exports.getUserById = id => {
   return db("users")
-    .select(["id", "name", "email", "avatar", "password"])
+    .select(["id", "name", "email", "avatar"])
     .where({ id })
     .first();
 };
