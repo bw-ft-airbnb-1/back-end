@@ -11,6 +11,24 @@ const generateAToken = userData => {
   return token;
 };
 
+exports.getToken = (req, res, next) => {
+  try {
+    const { authorization } = req.headers;
+    if (!authorization) {
+      return res.status(401).json({ error: "Please provide a token" });
+    }
+    const decoded = jwt.verify(authorization, process.env.TOKEN_SECRET);
+    console.log(decoded);
+    if (!decoded) {
+      return res.status(403).json({ error: "You shall not pass" });
+    }
+    req.userID = decoded.data.id;
+    next();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 exports.addUser = async (req, res) => {
   let { name, password, email } = req.body;
   if (!name || !email || !password) {
@@ -20,14 +38,20 @@ exports.addUser = async (req, res) => {
   }
   const nameArr = name.split(" ");
   name = nameArr[0];
-  const token = generateAToken({ name, email });
   const hash = bcrypt.hashSync(password, 8);
   const avatar =
     "https://res.cloudinary.com/dbcax4vbb/image/upload/v1578342211/computer-icons-user-profile-avatar-profile_saieve.jpg";
   password = hash;
   try {
-    const user = await User.createUser({ name, email, password, avatar });
-    return res.status(200).json({ user: user[0], token });
+    let user = await User.createUser({ name, email, password, avatar });
+    console.log(user);
+    user = await User.getUserById(user[0]);
+    console.log(user);
+    delete user.password;
+    console.log(user.id);
+    const token = generateAToken({ id: user.id });
+    console.log(token);
+    return res.status(200).json({ user, token });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Something Wrong with the database" });
@@ -51,10 +75,40 @@ exports.signIn = async (req, res) => {
       return res.status(401).json({ error: "Wrong email or password" });
     }
     delete user.password;
-    const token = generateAToken({ name: user.name, email });
+    const token = generateAToken({ id: user.id });
     return res.status(200).json({ user, token });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Something Wrong with the database" });
   }
 };
+
+exports.updateUser = async (req, res) => {
+  try {
+    let { name, email } = req.body;
+    const id = req.userID;
+    if (!name || !email) {
+      return res
+        .status(401)
+        .json({ error: "Missing name, email or password field" });
+    }
+    const nameArr = name.split(" ");
+    name = nameArr[0];
+    const user = await User.update(id, { name, email });
+    console.log(user);
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Something wrong with the server" });
+  }
+};
+
+exports.deleteUser = async (req,res) => {
+  try {
+    const id = req.userID;
+    await User.delete(id);
+    res.status(200).json({message: "User Deleted, Please Remove Token and redirect to homepage"})
+  } catch (error) {
+    res.status(500).json({error: "Server malfunctioning"})
+  }
+}
