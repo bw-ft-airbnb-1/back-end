@@ -1,15 +1,34 @@
 const express = require("express");
 
-const userController = require("../controllers/userController");
+const {
+  checkBodyAndHashPass,
+  addUser,
+  checkSignInBody,
+  checkIfUserExistsByEmail,
+  signIn,
+  getToken,
+  checkEditBody,
+  updateUser,
+  deleteUser,
+  getAllUsers
+} = require("../controllers/userController");
 
 const router = express.Router();
 
-router.post("/register", userController.addUser);
-router.post("/signin", userController.signIn);
+router.post("/register", checkBodyAndHashPass, addUser);
+router.post("/signin", checkSignInBody, checkIfUserExistsByEmail, signIn);
 router
   .route("/user")
-  .put(userController.getToken, userController.updateUser)
-  .delete(userController.getToken, userController.deleteUser)
-  .get(userController.getAllUsers);
+  .put(
+    getToken,
+    checkEditBody,
+    updateUser
+  )
+  .delete(getToken, deleteUser);
+
+//// ONLY FOR DEV
+if(process.env.NODE_ENV === "development"){
+  router.route("/users").get(getAllUsers);
+}
 
 module.exports = router;

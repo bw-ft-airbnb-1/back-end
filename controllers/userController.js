@@ -1,6 +1,61 @@
-const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+
+const User = require("../models/userModel");
+const AppError = require("../utils/appError");
+const { catchAsync } = require("../utils/catchAsync");
+
+//////// BODY VALIDATION AND MIDDLEWARE //////////////
+exports.checkBodyAndHashPass = catchAsync(async (req, res, next) => {
+  let { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return next(new AppError("Enter name, email and password", 401));
+  }
+  if (name.includes(" ")) {
+    name = name.split(" ")[0];
+  }
+  const user = await User.getUserByEmail(email);
+  if (user) {
+    return next(new AppError("User with that email already exists", 401));
+  }
+  const hash = bcrypt.hashSync(password, 8);
+  password = hash;
+  const avatar =
+    "https://res.cloudinary.com/dbcax4vbb/image/upload/v1578342211/computer-icons-user-profile-avatar-profile_saieve.jpg";
+  req.userBody = { name, email, password, avatar };
+  next();
+});
+
+exports.checkIfUserExistsByEmail = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.getUserByEmail(email);
+  if (!user) {
+    return next(new AppError("Could not find a user with that email", 401));
+  }
+  req.user = user;
+  next();
+});
+
+exports.checkSignInBody = (req, res, next) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return next(new AppError("Please provide email and password", 401));
+  }
+  next();
+};
+
+exports.checkEditBody = (req, res, next) => {
+  let { email, name, avatar } = req.body;
+  if (!email || !name || !avatar) {
+    return next(new AppError("Please provide email, name and avatar", 401));
+  }
+  if(name.includes(" ")){
+    name = name.split(" ")[0];
+  }
+  req.user = {email,name,avatar};
+  next() 
+};
 
 const generateAToken = userData => {
   const privateKey = process.env.TOKEN_SECRET;
@@ -12,118 +67,59 @@ const generateAToken = userData => {
 };
 
 exports.getToken = (req, res, next) => {
-  try {
-    const { authorization } = req.headers;
-    if (!authorization) {
-      return res.status(401).json({ error: "Please provide a token" });
-    }
-    const decoded = jwt.verify(authorization, process.env.TOKEN_SECRET);
-    console.log(decoded);
-    if (!decoded) {
-      return res.status(403).json({ error: "You shall not pass" });
+  const { authorization } = req.headers;
+  if (!authorization) {
+    return next(new AppError("Please provide a token", 401));
+  }
+  jwt.verify(authorization, process.env.TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return next(new AppError("Invalid Token", 403));
     }
     req.userID = decoded.data.id;
     next();
-  } catch (error) {
-    console.log(error);
-  }
+  });
 };
 
-exports.addUser = async (req, res) => {
-  let { name, password, email } = req.body;
-  if (!name || !email || !password) {
-    return res
-      .status(401)
-      .json({ error: "Missing name, email or password field" });
-  }
-  const nameArr = name.split(" ");
-  name = nameArr[0];
-  const hash = bcrypt.hashSync(password, 8);
-  const avatar =
-    "https://res.cloudinary.com/dbcax4vbb/image/upload/v1578342211/computer-icons-user-profile-avatar-profile_saieve.jpg";
-  password = hash;
-  try {
-    let user = await User.createUser({ name, email, password, avatar });
-    console.log(user);
-    user = await User.getUserById(user[0].id);
-    console.log(user);
-    delete user.password;
-    console.log(user.id);
-    const token = generateAToken({ id: user.id });
-    console.log(token);
-    return res.status(200).json({ user: user, token });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Something Wrong with the database" });
-  }
-};
+///// ROUTE CONTROLLERS
+exports.addUser = catchAsync(async (req, res, next) => {
+  let user = await User.createUser(req.userBody);
+  user = user[0];
+  const token = generateAToken(user);
+  return res.status(200).json({ user, token });
+});
 
-exports.signIn = async (req, res) => {
-  let { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(401).json({ error: "Missing email or password field" });
+exports.signIn = catchAsync(async (req, res, next) => {
+  let { password } = req.body;
+  const user = req.user;
+  const checkPass = bcrypt.compareSync(password, user.password);
+  if (!checkPass) {
+    return next(new AppError("Wrong email or password", 401));
   }
-  try {
-    const user = await User.getUserByEmail(email);
-    if (!user) {
-      return res
-        .status(401)
-        .json({ error: "Did not find user with that email" });
-    }
-    const checkPass = bcrypt.compareSync(password, user.password);
-    if (!checkPass) {
-      return res.status(401).json({ error: "Wrong email or password" });
-    }
-    delete user.password;
-    const token = generateAToken({ id: user.id });
-    return res.status(200).json({ user, token });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "Something Wrong with the database" });
-  }
-};
+  delete user.password;
+  const token = generateAToken(user);
+  return res.status(200).json({ user, token });
+});
 
-exports.updateUser = async (req, res) => {
-  try {
-    let { name, email } = req.body;
-    const id = req.userID;
-    if (!name || !email) {
-      return res
-        .status(401)
-        .json({ error: "Missing name, email or password field" });
-    }
-    const nameArr = name.split(" ");
-    name = nameArr[0];
-    const user = await User.update(id, { name, email });
-    console.log(user);
-    res.status(200).json(user[0]);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Something wrong with the server" });
-  }
-};
+exports.updateUser = catchAsync(async (req, res) => {
+  const user = await User.update(req.userID, req.user);
+  res.status(200).json(user[0]);
+});
 
-exports.deleteUser = async (req, res) => {
-  try {
-    const id = req.userID;
-    await User.delete(id);
-    res.status(200).json({
-      message: "User Deleted, Please Remove Token and redirect to homepage"
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Server malfunctioning" });
-  }
-};
+exports.deleteUser = catchAsync(async (req, res) => {
+  await User.delete(req.userID);
+  res.status(200).json({
+    message: "User Deleted, Please Remove Token and redirect to homepage"
+  });
+});
 
-exports.getAllUsers = async (req, res) => {
+
+
+/// ONLY FOR DEV
+exports.getAllUsers = catchAsync(async (req, res) => {
   const { role } = req.body;
   if (!role) {
     return res.status(403).json({ error: "You shall not pass" });
   }
-  try {
-    const users = await User.getAllUsers();
-    return res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ error: "Server malfunctioning" });
-  }
-};
+  const users = await User.getAllUsers();
+  return res.status(200).json(users);
+});

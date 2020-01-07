@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 
 const userRoute = require("./routes/userRoutes");
-
+const globalErrorHandler = require("./controllers/errorController");
+const AppError = require("./utils/appError");
 const app = express();
 
 app.use(cors());
@@ -12,7 +13,11 @@ app.get("/", (req, res) => res.send("Hello World"));
 app.use("/api/v1/user", userRoute);
 
 app.all("*", (req, res, next) => {
-  res.status(404).json({ error: `Can't find ${req.originalUrl}` });
+  next(
+    new AppError(`Can't do ${req.method} request to ${req.originalUrl}`, 404)
+  );
 });
 
-module.exports = app
+app.use(globalErrorHandler);
+
+module.exports = app;
