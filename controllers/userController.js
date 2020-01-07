@@ -47,9 +47,9 @@ exports.addUser = async (req, res) => {
     console.log(user);
     user = await User.getUserById(user[0]);
     console.log(user);
-    delete user.password;
+    delete user[0].password;
     console.log(user.id);
-    const token = generateAToken({ id: user.id });
+    const token = generateAToken({ id: user[0].id });
     console.log(token);
     return res.status(200).json({ user: user[0], token });
   } catch (error) {
@@ -107,11 +107,9 @@ exports.deleteUser = async (req, res) => {
   try {
     const id = req.userID;
     await User.delete(id);
-    res
-      .status(200)
-      .json({
-        message: "User Deleted, Please Remove Token and redirect to homepage"
-      });
+    res.status(200).json({
+      message: "User Deleted, Please Remove Token and redirect to homepage"
+    });
   } catch (error) {
     res.status(500).json({ error: "Server malfunctioning" });
   }
