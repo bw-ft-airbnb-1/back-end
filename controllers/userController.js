@@ -46,15 +46,15 @@ exports.checkSignInBody = (req, res, next) => {
 };
 
 exports.checkEditBody = (req, res, next) => {
-  let { email, name, avatar } = req.body;
-  if (!email || !name || !avatar) {
-    return next(new AppError("Please provide email, name and avatar", 401));
+  let { email, name } = req.body;
+  if (!email || !name) {
+    return next(new AppError("Please provide email and name ", 401));
   }
-  if(name.includes(" ")){
+  if (name.includes(" ")) {
     name = name.split(" ")[0];
   }
-  req.user = {email,name,avatar};
-  next() 
+  req.user = { email, name };
+  next();
 };
 
 const generateAToken = userData => {
@@ -111,8 +111,6 @@ exports.deleteUser = catchAsync(async (req, res) => {
     message: "User Deleted, Please Remove Token and redirect to homepage"
   });
 });
-
-
 
 /// ONLY FOR DEV
 exports.getAllUsers = catchAsync(async (req, res) => {
