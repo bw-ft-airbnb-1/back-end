@@ -45,13 +45,13 @@ exports.addUser = async (req, res) => {
   try {
     let user = await User.createUser({ name, email, password, avatar });
     console.log(user);
-    user = await User.getUserById(user[0]);
+    user = await User.getUserById(user.id);
     console.log(user);
-    delete user[0].password;
+    delete user.password;
     console.log(user.id);
-    const token = generateAToken({ id: user[0].id });
+    const token = generateAToken({ id: user.id });
     console.log(token);
-    return res.status(200).json({ user: user[0], token });
+    return res.status(200).json({ user: user, token });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: "Something Wrong with the database" });
