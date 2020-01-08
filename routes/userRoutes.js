@@ -25,8 +25,6 @@ router
   .delete(getToken, deleteUser);
 
 //// ONLY FOR DEV
-if (process.env.NODE_ENV === "development") {
-  router.route("/users").get(getAllUsers);
-}
+router.route("/users").get(getAllUsers);
 
 module.exports = router;

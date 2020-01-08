@@ -52,3 +52,13 @@ exports.getAllPropertiesWithExtras = async userid => {
   const newProps = await getNewProps();
   return newProps;
 };
+
+exports.deleteAProperty = propertyid => {
+  return db('properties').where({id}).del()
+}
+
+exports.findOneByID = async propertyid => {
+  const property = await db('properties').where({id}).first()
+  return property
+}
+
