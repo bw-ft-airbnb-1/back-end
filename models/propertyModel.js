@@ -35,8 +35,12 @@ exports.findAllAmenitiesForProperties = propertyid => {
 
 exports.getAllPropertiesByUserId = userid => {
   return db("properties as p")
+    .select(defaultSelectProperties)
     .where("user_id", "=", userid)
-    .select(defaultSelectProperties);
+
+    .join("property_types as pt", "pt.id", "=", "p.property_type_id")
+    .join("bed_types as bt", "bt.id", "=", "p.bed_type_id")
+    .join("room_types as rt", "rt.id", "=", "p.room_type_id");
 };
 
 exports.deleteAProperty = propertyid => {
