@@ -1,5 +1,6 @@
 // Update with your config settings.
-
+require('dotenv').config();
+console.log(process.env.DATABASE_PASSWORD)
 module.exports = {
   development: {
     client: "pg",
@@ -7,7 +8,7 @@ module.exports = {
       host: "localhost",
       port: 5432,
       user: "postgres",
-      password: "Blackbox123",
+      password: process.env.DATABASE_PASSWORD,
       database: "airbnb"
     },
     seeds: {
@@ -19,10 +20,13 @@ module.exports = {
   },
 
   testing: {
-    client: "sqlite",
-    useNullAsDefault: true,
+    client: "pg",
     connection: {
-      filename: "./data/testing.sqlite3"
+      host: "localhost",
+      port: 5432,
+      user: "postgres",
+      password: process.env.DATABASE_PASSWORD,
+      database: "airbnbtest"
     },
     seeds: {
       directory: "./data/seeds"
