@@ -1,6 +1,5 @@
 // Update with your config settings.
 require('dotenv').config();
-console.log(process.env.DATABASE_PASSWORD)
 module.exports = {
   development: {
     client: "pg",

@@ -76,8 +76,6 @@ exports.getToken = (req, res, next) => {
       return next(new AppError("Invalid Token", 403));
     }
     req.userID = decoded.data.id;
-    console.log(decoded.data);
-    console.log(req.userID);
     req.user = decoded.data;
     next();
   });
