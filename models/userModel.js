@@ -1,6 +1,5 @@
 const db = require("../data/dbConfig.js");
 const {
-  getAllPhotosForProperties,
   getAllAmenitiesForProperties,
   getAllPropertiesByUserId
 } = require("./propertyModel");
@@ -43,12 +42,8 @@ exports.getProperties = async userid => {
   const propertiesRes = await getAllPropertiesByUserId(userid);
   const properties = await Promise.all(
     propertiesRes.map(async property => {
-      const photosRes = getAllPhotosForProperties(property.id);
-      const amenitiesRes = getAllAmenitiesForProperties(property.id);
-      const res = await Promise.all([photosRes, amenitiesRes]);
-      const [photos, amenities] = res;
-      property.photos = photos.map(photo => photo.url);
-      property.amenities = amenities.map(amenity => amenity.name);
+      const amenities = await getAllAmenitiesForProperties(property.id);
+      property.amenities = amenities;
       return property;
     })
   );

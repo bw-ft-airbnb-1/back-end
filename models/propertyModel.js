@@ -1,54 +1,49 @@
 const db = require("../data/dbConfig.js");
 
 const defaultSelectProperties = [
-  "id",
-  "minimum_nights as minimumNights",
-  "bedrooms",
-  "bathrooms",
-  "entire_place as entirePlace",
-  "accommodates",
-  "property_type as propertyType",
-  "city",
-  "state",
-  "zip_code as zipCode",
-  "address",
-  "user_id as ownerId",
-  "bed_type as bedType",
-  "security_deposit as securityDeposit",
-  "optimal_price as optimalPrice"
+  "p.id",
+  "p.minimum_nights",
+  "p.bedrooms",
+  "p.bathrooms",
+  "p.security_deposit",
+  "p.price",
+  "p.image",
+  "p.zip_code",
+  "p.accommodates",
+  "pt.type as property_type",
+  "bt.type as bed_types",
+  "rt.type as room_type"
 ];
 
-// exports.getAllPropertiesByUserId = userid => {
-//   return db("properties")
-//     .where("user_id", "=", userid)
-//     .select(defaultSelectProperties);
-// };
+/// FINDS PROPERTY BY ID - ONLY RETURNS PROPERTY OBJECT
+exports.findPropertyById = propertyid => {
+  return db("properties as p")
+    .select(defaultSelectProperties)
+    .where("p.id", "=", propertyid)
+    .first()
+    .join("property_types as pt", "pt.id", "=", "p.property_type_id")
+    .join("bed_types as bt", "bt.id", "=", "p.bed_type_id")
+    .join("room_types as rt", "rt.id", "=", "p.room_type_id");
+};
 
-// exports.getAllPhotosForProperties = propertyid => {
-//   return db("properties_images")
-//     .where("property_id", "=", propertyid)
-//     .select("url");
-// };
+exports.findAllAmenitiesForProperties = propertyid => {
+  return db("properties_amenities as pa")
+    .join("amenities as a", "a.id", "=", "pa.amenity_id")
+    .where("pa.property_id", "=", propertyid)
+    .select("name");
+};
 
-// exports.getAllAmenitiesForProperties = propertyid => {
-//   return db("properties_amenities as pa")
-//     .join("amenities as a", "a.id", "=", "pa.amenity_id")
-//     .where("pa.property_id", "=", propertyid)
-//     .select("name");
-// };
+exports.getAllPropertiesByUserId = userid => {
+  return db("properties as p")
+    .where("user_id", "=", userid)
+    .select(defaultSelectProperties);
+};
 
-// exports.deleteAProperty = propertyid => {
-//   return db("properties")
-//     .del()
-//     .where({ id: propertyid });
-// };
-
-// exports.findPropertyById = propertyid => {
-//   return db("properties")
-//     .select(defaultSelectProperties)
-//     .where({ id: propertyid })
-//     .first();
-// };
+exports.deleteAProperty = propertyid => {
+  return db("properties")
+    .del()
+    .where({ id: propertyid });
+};
 
 // exports.findCompletePropertyById = async propertyid => {
 //   const propertyRes = this.findPropertyById(propertyid);

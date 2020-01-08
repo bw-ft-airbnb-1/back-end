@@ -73,7 +73,6 @@ exports.up = function(knex) {
         .inTable("users")
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
-      tbl.string("bed_type");
     })
     .createTable("amenities", tbl => {
       tbl.increments();

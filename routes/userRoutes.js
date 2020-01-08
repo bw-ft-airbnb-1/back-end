@@ -25,7 +25,7 @@ router
   .put(getToken, checkEditBody, updateUser)
   .delete(getToken, deleteUser);
 
-// router.get("/properties", getToken, getAllUserProperties);
+router.get("/properties", getToken, getAllUserProperties);
 
 //// ONLY FOR DEV
 router.route("/users").get(getAllUsers);
