@@ -37,24 +37,6 @@ exports.getAllAmenitiesForProperties = propertyid => {
     .select("name");
 };
 
-exports.getAllPropertiesWithExtras = async userid => {
-  const propertiesRes = await this.getAllPropertiesByUserId(userid);
-
-  const properties = await Promise.all(
-    propertiesRes.map(async property => {
-      const photosRes = this.getAllPhotosForProperties(property.id);
-      const amenitiesRes = this.getAllAmenitiesForProperties(property.id);
-      const res = await Promise.all([photosRes, amenitiesRes]);
-      const [photos, amenities] = res;
-      property.photos = photos.map(photo => photo.url);
-      property.amenities = amenities.map(amenity => amenity.name);
-      return property;
-    })
-  );
-
-  return properties;
-};
-
 exports.deleteAProperty = propertyid => {
   return db("properties")
     .del()

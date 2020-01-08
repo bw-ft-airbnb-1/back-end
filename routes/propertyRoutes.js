@@ -2,7 +2,6 @@ const express = require("express");
 
 const { getToken } = require("../controllers/userController");
 const {
-  getPropertiesByUserId,
   deleteProperty,
   validatePropertyID,
   validatePropertyRights,
@@ -10,7 +9,6 @@ const {
 } = require("../controllers/propertyController");
 
 const router = express.Router();
-router.route("/").get(getToken, getPropertiesByUserId);
 
 router
   .route("/:propertyid")

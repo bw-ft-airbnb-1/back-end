@@ -126,3 +126,8 @@ exports.getAllUsers = catchAsync(async (req, res) => {
 exports.getOneUser = (req, res) => {
   res.status(200).json(req.user);
 };
+
+exports.getAllUserProperties = catchAsync(async (req, res) => {
+  const properties = await User.getProperties(req.userID);
+  res.json(properties);
+});

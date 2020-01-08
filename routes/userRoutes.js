@@ -11,7 +11,8 @@ const {
   updateUser,
   deleteUser,
   getAllUsers,
-  getOneUser
+  getOneUser,
+  getAllUserProperties
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -23,6 +24,8 @@ router
   .get(getToken, getOneUser)
   .put(getToken, checkEditBody, updateUser)
   .delete(getToken, deleteUser);
+
+router.get("/properties", getToken, getAllUserProperties);
 
 //// ONLY FOR DEV
 router.route("/users").get(getAllUsers);

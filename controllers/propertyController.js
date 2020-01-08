@@ -2,18 +2,27 @@ const { catchAsync } = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const Property = require("../models/propertyModel");
 
+/// GET PROPERTY BY PROPERTY ID - RETURNS PROPERTY WITH AMENITIES AND PHOTOS
+exports.getPropertyById = catchAsync(async (req, res) => {
+  const property = await Property.findCompletePropertyById(req.property.id);
+  res.status(200).json(property);
+});
+
+/// GET ALL PROPERTIES BY USER ID - RETURNS PROPERTIES WITH AMENITIES AND PHOTOS
 exports.getPropertiesByUserId = catchAsync(async (req, res) => {
   const id = req.userID;
   const houses = await Property.getAllPropertiesWithExtras(id);
   res.status(200).json(houses);
 });
 
-exports.getPropertyById = catchAsync(async (req, res) => {
-  const property = await Property.findCompletePropertyById(req.property.id);
-  res.status(200).json(property);
+/// DELETES PROPERTY BY PROPERTY ID
+exports.deleteProperty = catchAsync(async (req, res) => {
+  await Property.deleteAProperty(req.property.id);
+  res.status(200).json({ message: "Property Deleted!" });
 });
 
-exports.deleteProperty = catchAsync(async (req, res) => {
+/// DELETES PROPERTY BY PROPERTY ID
+exports.editProperty = catchAsync(async (req, res) => {
   await Property.deleteAProperty(req.property.id);
   res.status(200).json({ message: "Property Deleted!" });
 });
