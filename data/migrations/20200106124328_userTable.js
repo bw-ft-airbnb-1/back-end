@@ -105,9 +105,10 @@ exports.down = function(knex) {
   return knex.schema
     .dropTableIfExists("properties_amenities")
     .dropTableIfExists("amenities")
+    .dropTableIfExists("properties_images")
     .dropTableIfExists("properties")
     .dropTableIfExists("bed_types")
     .dropTableIfExists("room_types")
     .dropTableIfExists("property_types")
-    .dropTableIfExists("users");
+    .dropTableIfExists("users")
 };
