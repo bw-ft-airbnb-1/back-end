@@ -15,7 +15,13 @@ const defaultSelectProperties = [
   "rt.type as room_type"
 ];
 
-/// FINDS PROPERTY BY ID - ONLY RETURNS PROPERTY OBJECT
+class Property {
+  constructor(obj){
+
+  }
+}
+
+/// FINDS PROPERTY BY ID - ONLY RETURNS PROPERTY OBJECTS WITHOUT AMENITIES
 exports.findPropertyById = propertyid => {
   return db("properties as p")
     .select(defaultSelectProperties)
@@ -33,15 +39,10 @@ exports.findAllAmenitiesForProperties = propertyid => {
     .select("name");
 };
 
-exports.getAllPropertiesByUserId = userid => {
-  return db("properties as p")
-    .select(defaultSelectProperties)
-    .where("user_id", "=", userid)
+exports.createProperty = body => {
 
-    .join("property_types as pt", "pt.id", "=", "p.property_type_id")
-    .join("bed_types as bt", "bt.id", "=", "p.bed_type_id")
-    .join("room_types as rt", "rt.id", "=", "p.room_type_id");
-};
+}
+
 
 exports.deleteAProperty = propertyid => {
   return db("properties")
