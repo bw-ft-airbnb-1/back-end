@@ -1,5 +1,4 @@
 const db = require("../data/dbConfig.js");
-const AppError = require("../utils/appError");
 
 exports.getUserById = id => {
   return db("users")
