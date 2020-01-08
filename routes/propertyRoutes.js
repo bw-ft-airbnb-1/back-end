@@ -18,8 +18,8 @@ router.get("/getOptions", getToken, getPropertiesOptions);
 router
   .route("/:propertyid")
   .all(validatePropertyID, getToken)
-  .get(getPropertyById);
-// .all(validatePropertyRights)
-// .delete(deleteProperty);
+  .get(getPropertyById)
+  .all(validatePropertyRights)
+  .delete(deleteProperty);
 
 module.exports = router;

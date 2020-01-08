@@ -49,17 +49,6 @@ exports.deleteAProperty = propertyid => {
     .where({ id: propertyid });
 };
 
-// exports.findCompletePropertyById = async propertyid => {
-//   const propertyRes = this.findPropertyById(propertyid);
-//   const photosRes = this.getAllPhotosForProperties(propertyid);
-//   const amenitiesRes = this.getAllAmenitiesForProperties(propertyid);
-//   const res = await Promise.all([propertyRes, photosRes, amenitiesRes]);
-//   const [property, photos, amenities] = res;
-//   property.images = photos.map(photo => photo.url);
-//   property.amenities = amenities.map(amenity => amenity.name);
-//   return property;
-// };
-
 exports.findPropertiesOptions = async () => {
   const propertyTypes = db("property_types");
   const roomTypes = db("room_types");

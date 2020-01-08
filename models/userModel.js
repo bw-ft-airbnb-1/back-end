@@ -44,6 +44,7 @@ exports.getProperties = async userid => {
     propertiesRes.map(async property => {
       const amenities = await findAllAmenitiesForProperties(property.id);
       property.amenities = amenities;
+      console.log(amenities);
       return property;
     })
   );

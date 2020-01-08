@@ -17,13 +17,13 @@ exports.getPropertyById = catchAsync(async (req, res) => {
 //   res.status(200).json(houses);
 // });
 
-// /// DELETES PROPERTY BY PROPERTY ID
-// exports.deleteProperty = catchAsync(async (req, res) => {
-//   await Property.deleteAProperty(req.property.id);
-//   res.status(200).json({ message: "Property Deleted!" });
-// });
+/// DELETES PROPERTY BY PROPERTY ID
+exports.deleteProperty = catchAsync(async (req, res) => {
+  await Property.deleteAProperty(req.property.id);
+  res.status(200).json({ message: "Property Deleted!" });
+});
 
-// /// DELETES PROPERTY BY PROPERTY ID
+/// EDIT PROPERTY BY PROPERTY ID
 // exports.editProperty = catchAsync(async (req, res) => {
 //   await Property.deleteAProperty(req.property.id);
 //   res.status(200).json({ message: "Property Deleted!" });
@@ -54,9 +54,9 @@ exports.validatePropertyID = catchAsync(async (req, res, next) => {
   next();
 });
 
-// exports.validatePropertyRights = (req, res, next) => {
-//   if (req.property.ownerId !== req.userID) {
-//     throw new AppError("Not Authorized", 403);
-//   }
-//   next();
-// };
+exports.validatePropertyRights = (req, res, next) => {
+  if (req.property.ownerId !== req.userID) {
+    throw new AppError("Not Authorized", 403);
+  }
+  next();
+};
