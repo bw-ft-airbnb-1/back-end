@@ -1,6 +1,21 @@
 const db = require("../data/dbConfig.js");
 const { findAllAmenitiesForProperties } = require("./propertyModel");
 
+const defaultSelectProperties = [
+  "p.id",
+  "p.minimum_nights",
+  "p.bedrooms",
+  "p.bathrooms",
+  "p.security_deposit",
+  "p.price",
+  "p.image",
+  "p.zip_code",
+  "p.accommodates",
+  "pt.type as property_type",
+  "bt.type as bed_types",
+  "rt.type as room_type"
+];
+
 exports.getUserById = id => {
   return db("users")
     .select(["id", "name", "email", "avatar"])
