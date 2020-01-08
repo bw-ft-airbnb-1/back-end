@@ -17,7 +17,8 @@ const defaultSelectProperties = [
 
 class Property {
   constructor(obj){
-
+    if(!obj.minimum_nights || !obj.bedrooms || !obj)
+    this.minimum_knights
   }
 }
 
