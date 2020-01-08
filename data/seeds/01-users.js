@@ -2,8 +2,8 @@ const bcrypt = require("bcryptjs");
 const faker = require("faker");
 class User {
   constructor() {
-    this.name = faker.name.firstName();
-    this.email = faker.internet.email();
+    this.name = faker.name.firstName().toLowerCase();
+    this.email = faker.internet.email().toLowerCase();
     this.password = bcrypt.hashSync("pass", 8);
     this.avatar = faker.image.avatar();
   }

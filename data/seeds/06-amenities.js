@@ -13,6 +13,7 @@ exports.seed = function(knex) {
     new Amenities("breakfast"),
     new Amenities("security"),
     new Amenities("pool"),
-    new Amenities("patio")
+    new Amenities("patio"),
+    new Amenities("pets allowed")
   ]);
 };

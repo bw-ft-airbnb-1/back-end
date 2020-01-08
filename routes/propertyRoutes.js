@@ -5,16 +5,19 @@ const {
   deleteProperty,
   validatePropertyID,
   validatePropertyRights,
-  getPropertyById
+  getPropertyById,
+  getPropertiesOptions
 } = require("../controllers/propertyController");
 
 const router = express.Router();
 
-router
-  .route("/:propertyid")
-  .all(validatePropertyID, getToken)
-  .get(getPropertyById)
-  .all(validatePropertyRights)
-  .delete(deleteProperty);
+router.get("/getOptions", getToken, getPropertiesOptions);
+
+// router
+//   .route("/:propertyid")
+//   .all(validatePropertyID, getToken)
+//   .get(getPropertyById)
+//   .all(validatePropertyRights)
+//   .delete(deleteProperty);
 
 module.exports = router;

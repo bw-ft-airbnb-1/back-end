@@ -10,18 +10,61 @@ exports.up = function(knex) {
       tbl.string("avatar");
       tbl.string("password").notNullable();
     })
+    .createTable("property_types", tbl => {
+      tbl.increments();
+      tbl
+        .string("type")
+        .unique()
+        .notNullable();
+    })
+    .createTable("room_types", tbl => {
+      tbl.increments();
+      tbl
+        .string("type")
+        .unique()
+        .notNullable();
+    })
+    .createTable("bed_types", tbl => {
+      tbl.increments();
+      tbl
+        .string("type")
+        .unique()
+        .notNullable();
+    })
     .createTable("properties", tbl => {
       tbl.increments();
-      tbl.integer("minimum_nights");
-      tbl.integer("bedrooms");
-      tbl.integer("bathrooms");
-      tbl.string("entire_place");
-      tbl.integer("accommodates");
-      tbl.string("property_type");
-      tbl.string("city");
-      tbl.string("state");
-      tbl.string("zip_code");
-      tbl.string("address");
+      tbl.integer("minimum_nights").notNullable();
+      tbl.integer("bedrooms").notNullable(); /// 1 - 12
+      tbl.integer("bathrooms").notNullable(); /// 1 - 6
+      tbl.integer("security_deposit").notNullable();
+      tbl.integer("price").notNullable();
+      tbl.string("image").notNullable();
+      tbl.integer("zip_code").notNullable();
+      tbl.integer("accommodates").notNullable(); /// 1- 13
+      tbl
+        .integer("room_type_id")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("room_types")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+      tbl
+        .integer("property_type_id")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("property_types")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+      tbl
+        .integer("bed_type_id")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("bed_types")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
       tbl
         .integer("user_id")
         .unsigned()
@@ -29,23 +72,8 @@ exports.up = function(knex) {
         .references("id")
         .inTable("users")
         .onUpdate("CASCADE")
-        .onDelete("CASCADE")
-      tbl.string("bed_type")
-      tbl.integer("security_deposit")
-      tbl.integer("optimal_price")
-
-    })
-    .createTable("properties_images", tbl => {
-      tbl.increments();
-      tbl
-        .integer("property_id")
-        .unsigned()
-        .notNullable()
-        .references("id")
-        .inTable("properties")
-        .onUpdate("CASCADE")
         .onDelete("CASCADE");
-      tbl.string("url").notNullable();
+      tbl.string("bed_type");
     })
     .createTable("amenities", tbl => {
       tbl.increments();
@@ -61,7 +89,7 @@ exports.up = function(knex) {
         .notNullable()
         .references("id")
         .inTable("amenities")
-        .onUpdate("RESTRICT")
+        .onUpdate("CASCADE")
         .onDelete("CASCADE");
       tbl
         .integer("property_id")
@@ -69,18 +97,18 @@ exports.up = function(knex) {
         .notNullable()
         .references("id")
         .inTable("properties")
-        .onUpdate("RESTRICT")
+        .onUpdate("CASCADE")
         .onDelete("CASCADE");
-    })
+    });
 };
 
 exports.down = function(knex) {
   return knex.schema
-    .dropTableIfExists("properties_availability")
-    .dropTableIfExists("days")
     .dropTableIfExists("properties_amenities")
     .dropTableIfExists("amenities")
-    .dropTableIfExists("properties_images")
     .dropTableIfExists("properties")
+    .dropTableIfExists("bed_types")
+    .dropTableIfExists("room_types")
+    .dropTableIfExists("property_types")
     .dropTableIfExists("users");
 };
