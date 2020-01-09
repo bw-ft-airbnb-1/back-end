@@ -33,6 +33,7 @@ exports.up = function(knex) {
     })
     .createTable("properties", tbl => {
       tbl.increments();
+      tbl.integer("optimal_price").notNullable();
       tbl.integer("minimum_nights").notNullable();
       tbl.integer("bedrooms").notNullable(); /// 1 - 12
       tbl.integer("bathrooms").notNullable(); /// 1 - 6
@@ -110,5 +111,5 @@ exports.down = function(knex) {
     .dropTableIfExists("bed_types")
     .dropTableIfExists("room_types")
     .dropTableIfExists("property_types")
-    .dropTableIfExists("users")
+    .dropTableIfExists("users");
 };
