@@ -1,4 +1,5 @@
 const db = require("../data/dbConfig.js");
+const AppError = require("../utils/appError");
 
 const defaultSelectProperties = [
   "p.id",
@@ -14,13 +15,6 @@ const defaultSelectProperties = [
   "bt.type as bed_types",
   "rt.type as room_type"
 ];
-
-class Property {
-  constructor(obj){
-    if(!obj.minimum_nights || !obj.bedrooms || !obj)
-    this.minimum_knights
-  }
-}
 
 /// FINDS PROPERTY BY ID - ONLY RETURNS PROPERTY OBJECTS WITHOUT AMENITIES
 exports.findPropertyById = propertyid => {
@@ -43,7 +37,6 @@ exports.findAllAmenitiesForProperties = propertyid => {
 exports.addAmenitiesToProperties = async (amenities, id) => {
   await Promise.all(
     amenities.map(async amenity => {
-
       await db("properties_amenities").insert({
         property_id: id,
         amenity_id: amenity.id
@@ -71,7 +64,29 @@ exports.createProperty = async (body, amenities) => {
   }
 };
 
-
+exports.editAProperty = async (body, amenities) => {
+  const id = await db("properties")
+    .update(body)
+    .returning("id");
+  if (!amenities) {
+    const property = await this.findPropertyById(id[0]);
+    const amenities = [];
+    await db("properties_amenities")
+      .where("property_id", "=", id)
+      .del();
+    property.amenities = [];
+    return property;
+  }
+  await this.addAmenitiesToProperties(amenities, id[0]);
+  await db("properties_amenities")
+    .where("property_id", "=", id)
+    .del();
+  await this.addAmenitiesToProperties(amenities, id[0]);
+  const amenitiesRes = await this.findAllAmenitiesForProperties(id[0]);
+  const property = await this.findPropertyById(id[0]);
+  property.amenities = amenitiesRes;
+  return property;
+};
 
 exports.deleteAProperty = propertyid => {
   return db("properties")
