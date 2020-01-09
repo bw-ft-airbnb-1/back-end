@@ -14,6 +14,7 @@ class Property {
     this.property_type_id = randomNumber(11);
     this.bed_type_id = randomNumber(5);
     this.room_type_id = randomNumber(3);
+    this.optimal_price = randomNumber(1000);
   }
 }
 const properties = [];
