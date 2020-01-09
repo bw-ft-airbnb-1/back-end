@@ -12,7 +12,7 @@ exports.getPropertyById = catchAsync(async (req, res) => {
   res.status(200).json(property);
 });
 
-exports.newProperty = catchAsync(async (req, res,next) => {
+exports.newProperty = catchAsync(async (req, res, next) => {
   const err = validationResult(req);
   if (!err.isEmpty()) {
     return next(new AppError(err.errors, 401));
@@ -28,6 +28,7 @@ exports.newProperty = catchAsync(async (req, res,next) => {
     zip_code,
     accommodates,
     image,
+    optimal_price,
     price
   } = req.body;
 
@@ -40,6 +41,7 @@ exports.newProperty = catchAsync(async (req, res,next) => {
     zip_code,
     accommodates,
     image,
+    optimal_price,
     price,
     user_id: req.userID
   };
