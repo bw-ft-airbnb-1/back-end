@@ -12,6 +12,7 @@ const defaultSelectProperties = [
   "p.zip_code",
   "p.accommodates",
   "p.optimal_price",
+  "p.user_id",
   "pt.type as property_type",
   "bt.type as bed_types",
   "rt.type as room_type"

@@ -9,7 +9,8 @@ const {
   getPropertiesOptions,
   getForeignKeys,
   propertyValidator,
-  newProperty
+  newProperty,
+  editProperty
 } = require("../controllers/propertyController");
 
 const router = express.Router();
@@ -25,6 +26,10 @@ router
   .delete(deleteProperty);
 
 router.post("/", [getToken, getForeignKeys, ...propertyValidator], newProperty);
-router.put("/", [getToken, getForeignKeys, ...propertyValidator], newProperty);
+router.put(
+  "/:propertyid",
+  [getToken, validatePropertyID, getForeignKeys, ...propertyValidator],
+  editProperty
+);
 
 module.exports = router;

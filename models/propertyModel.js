@@ -12,6 +12,7 @@ const defaultSelectProperties = [
   "p.zip_code",
   "p.accommodates",
   "p.optimal_price",
+  "p.user_id",
   "pt.type as property_type",
   "bt.type as bed_types",
   "rt.type as room_type"
@@ -65,22 +66,21 @@ exports.createProperty = async (body, amenities) => {
   }
 };
 
-exports.editAProperty = async (body, amenities) => {
+exports.editAProperty = async (body, amenities, propertyId) => {
   const id = await db("properties")
+    .where("id", "=", propertyId)
     .update(body)
     .returning("id");
   if (!amenities) {
     const property = await this.findPropertyById(id[0]);
-    const amenities = [];
     await db("properties_amenities")
       .where("property_id", "=", id)
       .del();
     property.amenities = [];
     return property;
   }
-  await this.addAmenitiesToProperties(amenities, id[0]);
   await db("properties_amenities")
-    .where("property_id", "=", id)
+    .where("property_id", "=", propertyId)
     .del();
   await this.addAmenitiesToProperties(amenities, id[0]);
   const amenitiesRes = await this.findAllAmenitiesForProperties(id[0]);

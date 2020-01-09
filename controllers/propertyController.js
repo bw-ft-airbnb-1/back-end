@@ -51,13 +51,16 @@ exports.newProperty = catchAsync(async (req, res, next) => {
   return res.status(200).json(newProperty);
 });
 
-exports.editProperty = catchAsync(async (req, res) => {
+exports.editProperty = catchAsync(async (req, res, next) => {
+  if (req.property.user_id != req.userID) {
+    return next(new AppError("CANT DO THAT, NEED TO BE OWNER"));
+  }
   const err = validationResult(req);
   if (!err.isEmpty()) {
     return next(new AppError(err.errors, 401));
   }
   if (!req.body.image) {
-    req.body.image = faker.image.image();
+    req.body.image = req.property.image;
   }
   const {
     id,
@@ -88,12 +91,19 @@ exports.editProperty = catchAsync(async (req, res) => {
   };
 
   const amenities = req.amenities;
-  const newProperty = await Property.editAProperty(property, amenities);
+  const newProperty = await Property.editAProperty(
+    property,
+    amenities,
+    req.property.id
+  );
   return res.status(200).json(newProperty);
 });
 
 /// DELETES PROPERTY BY PROPERTY ID
 exports.deleteProperty = catchAsync(async (req, res) => {
+  if (req.property.user_id != req.userID) {
+    return next(new AppError("CANT DO THAT, NEED TO BE OWNER"));
+  }
   await Property.deleteAProperty(req.property.id);
   res.status(200).json({ message: "Property Deleted!" });
 });
