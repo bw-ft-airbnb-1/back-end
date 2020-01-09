@@ -12,7 +12,7 @@ exports.getPropertyById = catchAsync(async (req, res) => {
   res.status(200).json(property);
 });
 
-exports.newProperty = catchAsync(async (req, res) => {
+exports.newProperty = catchAsync(async (req, res,next) => {
   const err = validationResult(req);
   if (!err.isEmpty()) {
     return next(new AppError(err.errors, 401));
