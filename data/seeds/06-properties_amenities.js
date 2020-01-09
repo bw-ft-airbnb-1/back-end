@@ -8,13 +8,13 @@ let houseID = 1;
 let amenityID = 1;
 const propertiesAmenities = [];
 for (let i = 1; i <= 50; i++) {
-  if (amenityID === 6 && houseID === 11) {
+  if (amenityID === 50 && houseID === 11) {
     amenityID = 1;
     houseID = 1;
     propertiesAmenities.push(new PropertiesAmenities(amenityID, houseID));
     amenityID++;
     houseID++;
-  } else if (amenityID === 6 && houseID <= 10) {
+  } else if (amenityID === 50 && houseID <= 10) {
     amenityID = 1;
     propertiesAmenities.push(new PropertiesAmenities(amenityID, houseID));
     amenityID++;

@@ -40,9 +40,37 @@ exports.findAllAmenitiesForProperties = propertyid => {
     .select("name");
 };
 
-exports.createProperty = body => {
+exports.addAmenitiesToProperties = async (amenities, id) => {
+  await Promise.all(
+    amenities.map(async amenity => {
 
-}
+      await db("properties_amenities").insert({
+        property_id: id,
+        amenity_id: amenity.id
+      });
+      return;
+    })
+  );
+  return;
+};
+
+exports.createProperty = async (body, amenities) => {
+  const id = await db("properties")
+    .insert(body)
+    .returning("id");
+  if (!amenities) {
+    const property = await this.findPropertyById(id[0]);
+    property.amenities = [];
+    return property;
+  } else {
+    await this.addAmenitiesToProperties(amenities, id[0]);
+    const amenitiesRes = await this.findAllAmenitiesForProperties(id[0]);
+    const property = await this.findPropertyById(id[0]);
+    property.amenities = amenitiesRes;
+    return property;
+  }
+};
+
 
 
 exports.deleteAProperty = propertyid => {
@@ -64,5 +92,61 @@ exports.findPropertiesOptions = async () => {
     roomTypes: roomTypesArr,
     bedTypes: bedTypesArr,
     amenities: amenitiesArr
+  };
+};
+
+exports.checkAmenities = async amenities => {
+  const amenitiesToAdd = Object.keys(amenities)
+    .map((amenity, index) => {
+      if (amenities[amenity] !== false) {
+        return Object.keys(amenities)[index];
+      }
+    })
+    .filter(amenity => amenity);
+  const amenitiesPromise = await Promise.all(
+    amenitiesToAdd.map(async amenity => {
+      const checking = await db("amenities")
+        .select("id")
+        .where("name", "=", amenity)
+        .first();
+      if (!checking) {
+        throw new AppError(`Could not find amenity ${amenity}`, 401);
+      }
+      return checking;
+    })
+  );
+  return amenitiesPromise;
+};
+
+exports.checkTypes = async types => {
+  const { bed_type, room_type, property_type } = types;
+  let bedType = db("bed_types")
+    .select("id")
+    .where("bed_types.type", "=", bed_type)
+    .first();
+
+  let roomType = db("room_types")
+    .select("id")
+    .where("room_types.type", "=", room_type)
+    .first();
+  let propertyType = db("property_types")
+    .select("id")
+    .where("property_types.type", "=", property_type)
+    .first();
+  [bedType, roomType, propertyType] = await Promise.all([
+    bedType,
+    roomType,
+    propertyType
+  ]);
+  if (!bedType || !roomType || !propertyType) {
+    throw new AppError(
+      "Could not find the right bed type, room type, or property type",
+      401
+    );
+  }
+  return {
+    bed_type_id: bedType.id,
+    room_type_id: roomType.id,
+    property_type_id: propertyType.id
   };
 };
