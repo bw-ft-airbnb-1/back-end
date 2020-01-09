@@ -12,16 +12,30 @@ exports.up = function(knex) {
     })
     .createTable("properties", tbl => {
       tbl.increments();
-      tbl.integer("minimum_nights");
-      tbl.integer("bedrooms");
-      tbl.integer("bathrooms");
-      tbl.string("entire_place");
-      tbl.integer("accommodates");
-      tbl.string("property_type");
-      tbl.string("city");
-      tbl.string("state");
-      tbl.string("zip_code");
-      tbl.string("address");
+      tbl.integer("minimum_nights").notNullable();
+      tbl.integer("bedrooms").notNullable(); /// 1 - 12
+      tbl.integer("bathrooms").notNullable(); /// 1 - 6
+      tbl.integer("security_deposit").notNullable();
+      tbl.integer("price").notNullable(); // NEED TO
+      tbl.string("image").notNullable(); // NEED TO
+      tbl.integer("zip_code").notNullable();
+      tbl.integer("accommodates").notNullable(); /// 1- 13
+      tbl
+        .integer("room_type_id")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("room_types")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+      tbl
+        .integer("property_type_id")
+        .unsigned()
+        .notNullable()
+        .references("id")
+        .inTable("property_types")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
       tbl
         .integer("user_id")
         .unsigned()

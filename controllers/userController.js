@@ -5,7 +5,65 @@ const User = require("../models/userModel");
 const AppError = require("../utils/appError");
 const { catchAsync } = require("../utils/catchAsync");
 
-//////// BODY VALIDATION AND MIDDLEWARE //////////////
+
+//// ADDS NEW USER - RETURNS USER AND TOKEN
+exports.addUser = catchAsync(async (req, res, next) => {
+  let user = await User.createUser(req.userBody);
+  user = user[0];
+  const token = generateAToken(user);
+  return res.status(200).json({ user, token });
+});
+
+//// SIGN IN - RETURNS USER AND TOKEN
+exports.signIn = catchAsync(async (req, res, next) => {
+  let { password } = req.body;
+  const user = req.user;
+  const checkPass = bcrypt.compareSync(password, user.password);
+  if (!checkPass) {
+    return next(new AppError("Wrong email or password", 401));
+  }
+  delete user.password;
+  const token = generateAToken(user);
+  return res.status(200).json({ user, token });
+});
+
+//// UPDATE USER - RETURN EDITED USER
+exports.updateUser = catchAsync(async (req, res) => {
+  const user = await User.update(req.userID, req.user);
+  res.status(200).json(user[0]);
+});
+
+//// DELETE A USER - RETURNS MSG
+exports.deleteUser = catchAsync(async (req, res) => {
+  await User.delete(req.userID);
+  res.status(200).json({
+    message: "User Deleted, Please Remove Token and redirect to homepage"
+  });
+});
+
+//// GET ONE USER USING TOKEN
+exports.getOneUser = (req, res) => {
+  res.status(200).json(req.user);
+};
+
+/// ONLY FOR DEV
+exports.getAllUsers = catchAsync(async (req, res) => {
+  const { role } = req.body;
+  if (!role) {
+    return next(new AppError("Not Allowed"))
+  }
+  const users = await User.getAllUsers();
+  return res.status(200).json(users);
+});
+
+exports.getAllUserProperties = catchAsync(async (req, res) => {
+  const properties = await User.getProperties(req.userID);
+  res.status(200).json(properties);
+});
+
+
+
+//// MIDDLEWARE
 exports.checkBodyAndHashPass = catchAsync(async (req, res, next) => {
   let { name, email, password } = req.body;
 
@@ -79,50 +137,4 @@ exports.getToken = (req, res, next) => {
     req.user = decoded.data;
     next();
   });
-};
-
-///// ROUTE CONTROLLERS
-exports.addUser = catchAsync(async (req, res, next) => {
-  let user = await User.createUser(req.userBody);
-  user = user[0];
-  const token = generateAToken(user);
-  return res.status(200).json({ user, token });
-});
-
-exports.signIn = catchAsync(async (req, res, next) => {
-  let { password } = req.body;
-  const user = req.user;
-  const checkPass = bcrypt.compareSync(password, user.password);
-  if (!checkPass) {
-    return next(new AppError("Wrong email or password", 401));
-  }
-  delete user.password;
-  const token = generateAToken(user);
-  return res.status(200).json({ user, token });
-});
-
-exports.updateUser = catchAsync(async (req, res) => {
-  const user = await User.update(req.userID, req.user);
-  res.status(200).json(user[0]);
-});
-
-exports.deleteUser = catchAsync(async (req, res) => {
-  await User.delete(req.userID);
-  res.status(200).json({
-    message: "User Deleted, Please Remove Token and redirect to homepage"
-  });
-});
-
-/// ONLY FOR DEV
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const { role } = req.body;
-  if (!role) {
-    return res.status(403).json({ error: "You shall not pass" });
-  }
-  const users = await User.getAllUsers();
-  return res.status(200).json(users);
-});
-
-exports.getOneUser = (req, res) => {
-  res.status(200).json(req.user);
 };
