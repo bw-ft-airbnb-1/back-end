@@ -66,7 +66,7 @@ exports.editProperty = catchAsync(async (req, res) => {
     zip_code,
     accommodates,
     image,
-    optimal_price
+    optimal_price,
     price
   } = req.body;
 
