@@ -66,6 +66,7 @@ exports.editProperty = catchAsync(async (req, res) => {
     zip_code,
     accommodates,
     image,
+    optimal_price
     price
   } = req.body;
 
@@ -79,12 +80,13 @@ exports.editProperty = catchAsync(async (req, res) => {
     zip_code,
     accommodates,
     image,
+    optimal_price,
     price,
     user_id: req.userID
   };
 
   const amenities = req.amenities;
-  const newProperty = await Property.createProperty(property, amenities);
+  const newProperty = await Property.editAProperty(property, amenities);
   return res.status(200).json(newProperty);
 });
 

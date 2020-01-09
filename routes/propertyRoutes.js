@@ -25,5 +25,6 @@ router
   .delete(deleteProperty);
 
 router.post("/", [getToken, getForeignKeys, ...propertyValidator], newProperty);
+router.put("/", [getToken, getForeignKeys, ...propertyValidator], newProperty);
 
 module.exports = router;
