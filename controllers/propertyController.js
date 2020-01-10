@@ -53,7 +53,7 @@ exports.newProperty = catchAsync(async (req, res, next) => {
 
 exports.editProperty = catchAsync(async (req, res, next) => {
   if (req.property.user_id != req.userID) {
-    return next(new AppError("CANT DO THAT, NEED TO BE OWNER"));
+    return next(new AppError("CANT DO THAT, NEED TO BE OWNER",403));
   }
   const err = validationResult(req);
   if (!err.isEmpty()) {
@@ -91,6 +91,7 @@ exports.editProperty = catchAsync(async (req, res, next) => {
   };
 
   const amenities = req.amenities;
+  console.log(req.property.id)
   const newProperty = await Property.editAProperty(
     property,
     amenities,
@@ -100,9 +101,9 @@ exports.editProperty = catchAsync(async (req, res, next) => {
 });
 
 /// DELETES PROPERTY BY PROPERTY ID
-exports.deleteProperty = catchAsync(async (req, res) => {
+exports.deleteProperty = catchAsync(async (req, res,next) => {
   if (req.property.user_id != req.userID) {
-    return next(new AppError("CANT DO THAT, NEED TO BE OWNER"));
+    return next(new AppError("CANT DO THAT, NEED TO BE OWNER",403));
   }
   await Property.deleteAProperty(req.property.id);
   res.status(200).json({ message: "Property Deleted!" });
@@ -136,11 +137,11 @@ exports.validatePropertyID = catchAsync(async (req, res, next) => {
 exports.getForeignKeys = catchAsync(async (req, res, next) => {
   const { bed_type, room_type, property_type, amenities } = req.body;
   if (typeof amenities !== "object") {
-    return next(new AppError("Please provide amenities"));
+    return next(new AppError("Please provide amenities",401));
   }
   if (!bed_type || !room_type || !property_type) {
     return next(
-      new AppError("Please provide bed_types, room_types, and property_types")
+      new AppError("Please provide bed_types, room_types, and property_types",401)
     );
   }
   if (Object.keys(amenities).length != 0) {

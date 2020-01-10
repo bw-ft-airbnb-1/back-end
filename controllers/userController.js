@@ -77,7 +77,6 @@ exports.getToken = (req, res, next) => {
     }
     req.userID = decoded.data.id;
     req.user = decoded.data;
-    console.log("userid",req.userID)
     next();
   });
 };

@@ -15,7 +15,7 @@ const {
 
 const router = express.Router();
 
-/// GETS ALL FOREIGN VALUES THAT CLIENT MIGHT NEED FOR PROPERTIES
+/// GETS ALL FOREIGN VALUES THAT CLIENT MIGHT NEED FOR PROPERTIES - NOT USED
 router.get("/getOptions", getToken, getPropertiesOptions);
 
 /// PROPERTYBYID ROUTE {GET,EDIT,POST,DELETE}
